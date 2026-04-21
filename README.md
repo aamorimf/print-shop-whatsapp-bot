@@ -1,209 +1,194 @@
-# 🐾 Amigo de Patas — WhatsApp Bot
+🐾 Amigo de Patas WhatsApp Bot
+Automation for veterinary customer service via WhatsApp
 
-> A rule-based WhatsApp bot for a fictional veterinary clinic, built with Python and FastAPI.
+A rule-based WhatsApp bot built with FastAPI that simulates a real customer service assistant for a veterinary clinic.
+It handles common requests, provides pricing information, and guides users through a structured appointment flow.
 
----
+🚀 Overview
+This project demonstrates how to build a deterministic, state-driven chatbot integrated with real-world communication channels.
+The bot is designed for a fictional clinic “Veterinária Amigo de Patas”, and focuses on:
 
-## Overview
+* automated responses based on keywords
+* structured conversation flow
+* input validation (date/time)
+* simple appointment request handling
+* real WhatsApp interaction via Twilio Sandbox
 
-**Amigo de Patas** is a deterministic, keyword-driven WhatsApp bot designed for the fictional veterinary clinic *Veterinária Amigo de Patas*. It answers common questions about services, pricing, clinic hours, and address — and guides users through a simple appointment request flow using a state machine.
+🛠️ Tech Stack
+* Python
+* FastAPI
+* SQLite
+* SQLAlchemy
+* Pydantic
+* Twilio (WhatsApp Sandbox)
+* Ngrok 
 
-No LLMs. No AI. Just clean, predictable Python.
+🧠 Key Features
+* Greeting and fallback system
+* Consultation pricing
+* Vaccine pricing (predefined set)
+* Exam pricing (predefined set)
+* Clinic hours and address
+* Guided appointment flow (step-by-step)
+* Input validation for date and time
+* Draft → Pending appointment lifecycle
+* Separation of concerns (routing, services, state machine)
+* Real WhatsApp testing via Twilio
 
-This project was built as a portfolio piece to demonstrate applied knowledge of:
-- Clean Architecture principles in a Python web service
-- State-driven conversation flows without external AI dependencies
-- FastAPI, SQLAlchemy ORM, and SQLite for lightweight, deployable backends
-- Practical API design ready for real WhatsApp integration via Twilio or Meta Webhooks
+💬 Example Conversation
 
----
+User: oi
+Bot: Olá! Como posso ajudar?
 
-## Features
+User: consulta
+Bot: A consulta custa R$ X
 
-| Feature | Details |
-|---|---|
-| 💬 Greeting & Fallback Menu | Displays a help menu when user intent is unclear |
-| 💉 Vaccine Pricing | Lists all available vaccines and prices |
-| 🩺 Consultation Pricing | Returns general consultation fee |
-| 🔬 Exam Pricing | Returns full exam catalog with prices |
-| 🕒 Clinic Hours | Monday–Friday and Saturday schedules |
-| 📍 Clinic Address | Returns the clinic location |
-| 📅 Appointment Request | Guided, multi-step flow to collect tutor/pet/service/date/time |
-| ✅ Input Validation | Rejects vague date and time answers |
-| 🗃️ Draft Lifecycle | Appointments saved as `DRAFT` → `PENDING_CONFIRMATION` |
-| 🧪 Swagger Testing | `/api/test-message` for direct testing via Swagger UI |
-| 🌐 Simulated Webhook | `/api/webhook` mimics Meta/Twilio payload structure |
+User: agendar
+Bot: Qual o seu nome?
 
----
+User: Carlos
+Bot: Nome do pet?
 
-## Demo Flow
+User: Perry
+Bot: Tipo de atendimento?
 
-```
-User:  "quero agendar"
-Bot:   "Ótimo! Para começarmos, qual é o seu nome?"
+User: consulta
+Bot: Qual data?
 
-User:  "Carlos"
-Bot:   "Prazer, Carlos! Qual é o nome do seu pet?"
+User: amanhã
+Bot: Qual horário?
 
-User:  "Rex"
-Bot:   "O que o Rex precisa hoje? (Consulta, Vacina ou Exames)"
+User: 15h
+Bot: Solicitação registrada!
 
-User:  "vacina"
-Bot:   "Perfeito! Para qual data? (ex: hoje, amanha, quarta, 15/04)"
+🧱 Architecture
+The project follows a clean and modular structure:
 
-User:  "qualquer dia"
-Bot:   "Data inválida ou muito vaga. Por favor digite algo como: 'hoje', 'amanha', 'quinta' ou '15/04'."
+app/
+├── api/                # FastAPI routes
+├── db/                 # Database setup
+├── models/             # ORM models
+├── repositories/       # Database access layer
+├── services/           # Business logic
+│   ├── intent_router
+│   ├── scheduling_flow
+│   └── message_handler
+├── utils/              # Parsers and validators
 
-User:  "sexta"
-Bot:   "E qual período ou horário de preferência? (ex: manha, tarde, 15h, 10:30)"
+Design Highlights
+* Stateless routing layer
+* State-driven conversation flow
+* Deterministic logic (no AI dependency)
+* Clear separation between parsing, logic, and response
 
-User:  "tarde"
-Bot:   "Pronto, Carlos! Recebemos sua solicitação de vacina para o Rex em sexta (tarde).
-        ⚠️ Um atendente entrará em contato em breve para confirmar o horário exato!"
-```
+🧪 Local Setup
 
-> At any point in the flow, the user can type **"cancelar"** to reset and return to the main menu.
-
----
-
-## Architecture
-
-```
-amigo_de_patas_bot/
-├── app/
-│   ├── api/
-│   │   └── webhook_router.py        # Webhook + test endpoints
-│   ├── core/
-│   │   ├── constants.py             # Single source of truth: prices, hours, address
-│   │   └── enums.py                 # ConversationState + AppointmentStatus enums
-│   ├── db/
-│   │   └── database.py              # SQLite engine, session factory, init
-│   ├── models/
-│   │   └── schema.py                # SQLAlchemy + Pydantic models
-│   ├── repositories/
-│   │   ├── client_repository.py     # Client CRUD + state update
-│   │   └── appointment_repository.py # Draft lifecycle management
-│   ├── services/
-│   │   ├── message_handler.py       # Central orchestrator (IDLE vs. in-flow)
-│   │   ├── intent_router.py         # Stateless keyword → response routing
-│   │   ├── scheduling_flow.py       # State machine: step-by-step appointment
-│   │   └── response_builder.py      # Message formatting from constants
-│   └── utils/
-│       └── text_parser.py           # Text cleaning + date/time validation (regex)
-├── main.py                          # FastAPI app entry point
-├── requirements.txt
-└── README.md
-```
-
-**Key Separation of Concerns:**
-- `intent_router` handles all stateless intents (prices, hours, address)
-- `scheduling_flow` owns state transitions and input validation
-- `message_handler` decides which path a message takes
-- `response_builder` formats all output strings — business logic never builds strings directly
-
----
-
-## Tech Stack
-
-| | |
-|---|---|
-| **Language** | Python 3.11+ |
-| **Framework** | FastAPI |
-| **ORM** | SQLAlchemy 2.x |
-| **Database** | SQLite (local file) |
-| **Validation** | Pydantic v2 |
-| **Server** | Uvicorn |
-
----
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/aamorimf/amigo-de-patas-whatsapp-bot.git
+1. Clone the repository
+git clone https://github.com/SEU_USUARIO/amigo-de-patas-whatsapp-bot.git
 cd amigo-de-patas-whatsapp-bot
 
-# Create and activate virtual environment
+2. Create virtual environment
 python -m venv .venv
-.venv\Scripts\activate        # Windows
-# or: source .venv/bin/activate  # Linux/macOS
 
-# Install dependencies
+Activate:
+.\.venv\Scripts\Activate.ps1
+
+3. Install dependencies
 pip install -r requirements.txt
-```
 
----
+4. Run the API
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
 
-## Running Locally
+5. Access API docs
+http://127.0.0.1:8000/docs
 
-```bash
-python main.py
-```
+🧪 Manual Testing (Swagger)
 
-The server starts at `http://localhost:8000`.  
-The SQLite database file (`amigo_de_patas.db`) is created automatically on first run.
+Use endpoint:
+POST /api/test-message
 
-**Interactive API docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-## Testing via Swagger
-
-Open [http://localhost:8000/docs](http://localhost:8000/docs) and use the **`POST /api/test-message`** endpoint.
-
-### `/api/test-message` — Simple test endpoint
-
-```json
+Example payload:
 {
   "phone": "21999999999",
-  "text": "quero agendar"
+  "text": "oi"
 }
-```
 
-### `/api/webhook` — Simulated webhook endpoint
+📱 Real WhatsApp Testing (Twilio Sandbox)
 
-```json
-{
-  "phone_number": "21999999999",
-  "message": "quero saber sobre vacinas"
-}
-```
+1. Start ngrok
+ngrok http 8000
 
-Both endpoints return the bot's reply in the `response` field.
+Copy the HTTPS URL:
 
----
+https://your-url.ngrok-free.dev
 
-## Optional: Real WhatsApp Testing with Twilio Sandbox
+2. Configure Twilio Sandbox
+In Twilio Console → WhatsApp Sandbox:
 
-To test with a real WhatsApp number during development:
+When a message comes in:
+https://your-url.ngrok-free.dev/api/webhook/twilio
 
-1. Create a free [Twilio account](https://www.twilio.com/try-twilio)
-2. Activate the **Twilio Sandbox for WhatsApp**
-3. Expose your local server with [ngrok](https://ngrok.com/): `ngrok http 8000`
-4. Set the Twilio Sandbox webhook URL to: `https://<your-ngrok-id>.ngrok.io/api/webhook`
-5. Adapt the `handle_whatsapp_message` function in `webhook_router.py` to parse Twilio's `Form` payload format instead of JSON
+Method: POST
 
-> This project uses a simplified JSON payload for demo purposes. Adapting it to Twilio or the Meta Graph API requires only minimal changes to the webhook parser.
+3. Connect your WhatsApp
+Send to Twilio number:
 
----
+join your-sandbox-code
 
-## Future Improvements
+4. Test messages
 
-- [ ] Adapt `/api/webhook` to fully parse Meta Graph API payload format
-- [ ] Add Twilio Sandbox integration as a ready-to-use config flag
-- [ ] Lightweight admin panel (Streamlit or Jinja2) to view appointments
-- [ ] Migrate SQLite to PostgreSQL for cloud deployment (Railway / Render)
-- [ ] Add unit tests for intent routing and scheduling flow validation
+Send:
 
----
+oi
+consulta
+vacina
+exame
+agendar
 
-## Author
+🔄 How It Works
+1. User sends message via WhatsApp
+2. Twilio receives message
+3. Twilio sends webhook to FastAPI
+4. Bot processes message
+5. Response is returned as TwiML
+6. Twilio delivers message back to user
 
-Built by **Alessandro Amorim** as a portfolio project.  
-Demonstrating applied Python backend engineering, clean architecture, and practical API design.
+⚠️ Important Notes
+* Always ensure:
+    * API is running
+    * ngrok is active
+    * Twilio URL is correct
+* If ngrok restarts, update the URL in Twilio
+* Avoid using --reload with Uvicorn
 
-[![GitHub](https://img.shields.io/badge/GitHub-aamorimf-181717?logo=github)](https://github.com/aamorimf)
+🔮 Future Improvements
+* Admin dashboard (appointments + configuration)
+* Real scheduling integration (calendar)
+* Human handoff system
+* Multi-clinic support
+* Deployment to cloud environment
+* Authentication and access control
 
----
+🎯 Project Purpose
+This project was built to demonstrate:
 
-*This project uses a fictional clinic and fictional data for portfolio and educational purposes only.*
+* backend architecture skills
+* real-world API integration
+* automation of business workflows
+* clean code and maintainability
+* ability to bridge local systems with external platforms
+
+👨‍💻 Author
+
+Developed as a portfolio project focused on automation and real-world integrations.
+
+⭐ Final Insight
+This project goes beyond a simple chatbot.
+
+It demonstrates how to connect:
+
+* backend systems
+* structured logic
+* and real communication channels
+
+into a practical, production-oriented solution.
