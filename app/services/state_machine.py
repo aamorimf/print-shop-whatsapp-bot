@@ -32,6 +32,11 @@ def process_state_machine(db: Session, client: Client, message: str) -> str:
         quote = quote_repo.get_or_create_quote(db, client.id)
         return format_message(STATE_CONFIG["inicio"]["message"], quote)
 
+    if current_state == "final" and text in {"oi", "ola", "olá", "bom dia", "boa tarde", "boa noite"}:
+        client_repo.update_client_state(db, client, ConversationState.INICIO)
+        quote = quote_repo.reset_quote(db, client.id)
+        return format_message(STATE_CONFIG["inicio"]["message"], quote)
+
     config = STATE_CONFIG[current_state]
     quote = quote_repo.get_or_create_quote(db, client.id)
     

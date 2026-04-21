@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import declarative_base
+from datetime import datetime
 from app.core.enums import ConversationState
 
 Base = declarative_base()
@@ -14,6 +15,7 @@ class Client(Base):
         nullable=False,
         default=ConversationState.INICIO.value
     )
+    last_interaction_at = Column(DateTime, default=datetime.utcnow)
 
 class Quote(Base):
     __tablename__ = 'quotes'
