@@ -5,7 +5,10 @@ from app.core.enums import ConversationState
 def get_or_create_client(db: Session, phone_number: str) -> Client:
     client = db.query(Client).filter(Client.phone_number == phone_number).first()
     if not client:
-        client = Client(phone_number=phone_number, current_state=ConversationState.IDLE.value)
+        client = Client(
+            phone_number=phone_number,
+            current_state=ConversationState.INICIO.value
+        )
         db.add(client)
         db.commit()
         db.refresh(client)

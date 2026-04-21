@@ -14,13 +14,24 @@ def format_message(message: str, quote) -> str:
     return message.format(produto=produto, tamanho=tamanho, quantidade=quantidade)
 
 def process_state_machine(db: Session, client: Client, message: str) -> str:
-    current_state = client.current_state
-    
-    if current_state not in STATE_CONFIG or current_state == "IDLE":
-        # Se estiver fora do fluxo gráfico ou em IDLE, vai para o inicio
-        current_state = "inicio"
+    text = message.strip().lower()
+
+    if not client.current_state:
         client_repo.update_client_state(db, client, ConversationState.INICIO)
-    
+        quote = quote_repo.get_or_create_quote(db, client.id)
+        return format_message(STATE_CONFIG["inicio"]["message"], quote)
+
+    current_state = client.current_state
+
+    if current_state not in STATE_CONFIG:
+        client_repo.update_client_state(db, client, ConversationState.INICIO)
+        quote = quote_repo.get_or_create_quote(db, client.id)
+        return format_message(STATE_CONFIG["inicio"]["message"], quote)
+
+    if current_state == ConversationState.INICIO.value and text in {"oi", "olá", "ola", "menu", "iniciar", "start", "bom dia", "boa tarde", "boa noite"}:
+        quote = quote_repo.get_or_create_quote(db, client.id)
+        return format_message(STATE_CONFIG["inicio"]["message"], quote)
+
     config = STATE_CONFIG[current_state]
     quote = quote_repo.get_or_create_quote(db, client.id)
     

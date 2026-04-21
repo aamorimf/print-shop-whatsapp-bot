@@ -22,7 +22,7 @@ STATE_CONFIG = {
             "Perfeito! Sobre qual tipo de produto você deseja orçamento?\n\n"
             "1️⃣ Offset (Cartões, Panfletos)\n"
             "2️⃣ Comunicação Visual (Lonas, Adesivos)\n"
-            "3️⃣ Sublimação (Brindes)"
+            "3️⃣ Sublimação (Camisas, Wind banners)"
         ),
         "options": {
             "1": {"next": "coleta_produto", "action": {"field": "setor", "value": "offset"}},
@@ -119,7 +119,7 @@ STATE_CONFIG = {
     },
     "encaminhamento": {
         "type": "redirect",
-        "message": "Perfeito! Já anotei suas informações 👍\nVou encaminhar seu atendimento para um atendente 👍",
+        "message": "Perfeito! Já anotei suas informações 👍\nVou encaminhar seu atendimento para um atendente",
         "next": "final"
     },
     "final": {

@@ -1,194 +1,143 @@
-🐾 Amigo de Patas WhatsApp Bot
-Automation for veterinary customer service via WhatsApp
+🖨️ Atlas - WhatsApp Print Shop Bot
 
-A rule-based WhatsApp bot built with FastAPI that simulates a real customer service assistant for a veterinary clinic.
-It handles common requests, provides pricing information, and guides users through a structured appointment flow.
+Deterministic WhatsApp chatbot for print shop customer service
+
+A state-machine based WhatsApp bot built with FastAPI, designed to automate customer service and budget collection for print shops.
 
 🚀 Overview
-This project demonstrates how to build a deterministic, state-driven chatbot integrated with real-world communication channels.
-The bot is designed for a fictional clinic “Veterinária Amigo de Patas”, and focuses on:
+This project demonstrates how to build a deterministic, state-driven chatbot focused on structured customer interactions.
 
-* automated responses based on keywords
-* structured conversation flow
-* input validation (date/time)
-* simple appointment request handling
-* real WhatsApp interaction via Twilio Sandbox
-
-🛠️ Tech Stack
-* Python
-* FastAPI
-* SQLite
-* SQLAlchemy
-* Pydantic
-* Twilio (WhatsApp Sandbox)
-* Ngrok 
+Instead of relying on AI or keyword guessing, the bot uses a finite state machine (FSM) to guide the user step-by-step and collect complete order data.
 
 🧠 Key Features
-* Greeting and fallback system
-* Consultation pricing
-* Vaccine pricing (predefined set)
-* Exam pricing (predefined set)
-* Clinic hours and address
-* Guided appointment flow (step-by-step)
-* Input validation for date and time
-* Draft → Pending appointment lifecycle
-* Separation of concerns (routing, services, state machine)
-* Real WhatsApp testing via Twilio
+* Fully deterministic state machine
+* Menu-driven navigation (1, 2, 3)
+* Structured budget collection:
+    * setor (offset, sign, sublimação)
+    * produto
+    * tamanho
+    * quantidade
+* Persistent conversation context (per user)
+* Fallback system (error + state repeat)
+* WhatsApp integration via Twilio
+* Clean architecture (services, repositories, state engine)
 
 💬 Example Conversation
 
 User: oi
-Bot: Olá! Como posso ajudar?
 
-User: consulta
-Bot: A consulta custa R$ X
+Bot:
+Olá! Seja bem-vindo 👋
+Sou o assistente virtual da gráfica.
 
-User: agendar
-Bot: Qual o seu nome?
+1️⃣ Fazer um orçamento
+2️⃣ Tirar dúvidas
+3️⃣ Falar com atendente
 
-User: Carlos
-Bot: Nome do pet?
+User: 1
 
-User: Perry
-Bot: Tipo de atendimento?
+Bot:
+Perfeito! Sobre qual tipo de produto você deseja orçamento?
 
-User: consulta
-Bot: Qual data?
+1️⃣ Impressos (offset)
+2️⃣ Comunicação visual (sign)
+3️⃣ Sublimação
 
-User: amanhã
-Bot: Qual horário?
+User: 1
+User: cartão de visita
+User: 9x5
+User: 1000
 
-User: 15h
-Bot: Solicitação registrada!
+Bot:
+Perfeito! Só confirmando:
+
+Produto: cartão de visita
+Tamanho: 9x5
+Quantidade: 1000
 
 🧱 Architecture
-The project follows a clean and modular structure:
 
 app/
-├── api/                # FastAPI routes
-├── db/                 # Database setup
-├── models/             # ORM models
-├── repositories/       # Database access layer
-├── services/           # Business logic
-│   ├── intent_router
-│   ├── scheduling_flow
-│   └── message_handler
-├── utils/              # Parsers and validators
+├── api/
+├── core/
+│   ├── enums.py
+│   └── state_config.py
+├── db/
+├── models/
+├── repositories/
+├── services/
+│   ├── state_machine.py
+│   └── message_handler.py
 
-Design Highlights
-* Stateless routing layer
-* State-driven conversation flow
-* Deterministic logic (no AI dependency)
-* Clear separation between parsing, logic, and response
-
-🧪 Local Setup
-
-1. Clone the repository
-git clone https://github.com/SEU_USUARIO/amigo-de-patas-whatsapp-bot.git
-cd amigo-de-patas-whatsapp-bot
-
-2. Create virtual environment
-python -m venv .venv
-
-Activate:
-.\.venv\Scripts\Activate.ps1
-
-3. Install dependencies
-pip install -r requirements.txt
-
-4. Run the API
-python -m uvicorn main:app --host 127.0.0.1 --port 8000
-
-5. Access API docs
-http://127.0.0.1:8000/docs
-
-🧪 Manual Testing (Swagger)
-
-Use endpoint:
-POST /api/test-message
-
-Example payload:
-{
-  "phone": "21999999999",
-  "text": "oi"
-}
-
-📱 Real WhatsApp Testing (Twilio Sandbox)
-
-1. Start ngrok
-ngrok http 8000
-
-Copy the HTTPS URL:
-
-https://your-url.ngrok-free.dev
-
-2. Configure Twilio Sandbox
-In Twilio Console → WhatsApp Sandbox:
-
-When a message comes in:
-https://your-url.ngrok-free.dev/api/webhook/twilio
-
-Method: POST
-
-3. Connect your WhatsApp
-Send to Twilio number:
-
-join your-sandbox-code
-
-4. Test messages
-
-Send:
-
-oi
-consulta
-vacina
-exame
-agendar
+⚙️ Tech Stack
+* Python
+* FastAPI
+* SQLite
+* SQLAlchemy
+* Twilio API (WhatsApp)
+* Ngrok
 
 🔄 How It Works
 1. User sends message via WhatsApp
-2. Twilio receives message
-3. Twilio sends webhook to FastAPI
-4. Bot processes message
-5. Response is returned as TwiML
-6. Twilio delivers message back to user
+2. Twilio forwards message to API
+3. State Machine processes input
+4. Context is updated in database
+5. Response is generated
+6. Twilio sends reply back
+
+🧪 Local Setup
+
+git clone https://github.com/SEU_USUARIO/print-shop-whatsapp-bot.git
+cd print-shop-whatsapp-bot
+
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+pip install -r requirements.txt
+
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+
+📱 WhatsApp Testing (Twilio)
+
+ngrok http 8000
+
+Configure:
+
+https://YOUR_NGROK_URL/api/webhook/twilio
+
+Send:
+
+join your-code
 
 ⚠️ Important Notes
-* Always ensure:
-    * API is running
-    * ngrok is active
-    * Twilio URL is correct
-* If ngrok restarts, update the URL in Twilio
-* Avoid using --reload with Uvicorn
+* Do not use --reload
+* Keep ngrok running
+* Update URL if ngrok changes
+
+🎯 Design Principles
+* No AI dependency
+* Predictable flow
+* Business-driven logic
+* Data-first interaction
 
 🔮 Future Improvements
-* Admin dashboard (appointments + configuration)
-* Real scheduling integration (calendar)
-* Human handoff system
-* Multi-clinic support
-* Deployment to cloud environment
-* Authentication and access control
+* Admin dashboard
+* Multi-client support
+* CRM integration
+* Order tracking
+* Cloud deployment
 
-🎯 Project Purpose
-This project was built to demonstrate:
+🧠 Project Purpose
+This project demonstrates:
 
-* backend architecture skills
+* backend architecture
+* state machine design
 * real-world API integration
 * automation of business workflows
-* clean code and maintainability
-* ability to bridge local systems with external platforms
-
-👨‍💻 Author
-
-Developed as a portfolio project focused on automation and real-world integrations.
 
 ⭐ Final Insight
-This project goes beyond a simple chatbot.
+This is not just a chatbot.
 
-It demonstrates how to connect:
+It is a structured customer service system designed to:
 
-* backend systems
-* structured logic
-* and real communication channels
-
-into a practical, production-oriented solution.
+capture → organize → convert
