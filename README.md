@@ -1,4 +1,7 @@
-🖨️ Atlas - WhatsApp Print Shop Bot
+# 🖨️ Atlas — WhatsApp Print Shop Bot
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-Framework-green)
+![Status](https://img.shields.io/badge/status-in%20development-orange)
 
 Deterministic WhatsApp chatbot for print shop customer service
 
@@ -8,6 +11,19 @@ A state-machine based WhatsApp bot built with FastAPI, designed to automate cust
 This project demonstrates how to build a deterministic, state-driven chatbot focused on structured customer interactions.
 
 Instead of relying on AI or keyword guessing, the bot uses a finite state machine (FSM) to guide the user step-by-step and collect complete order data.
+
+## 🧩 Why this project?
+
+Most chatbots rely on AI or keyword matching, which can lead to unpredictable behavior.
+
+This project was designed to demonstrate a different approach:
+
+- Deterministic logic
+- Full control over conversation flow
+- Business-oriented interaction
+- Reliable data collection
+
+The goal is to show how structured automation can solve real-world problems efficiently.
 
 🧠 Key Features
 * Fully deterministic state machine
